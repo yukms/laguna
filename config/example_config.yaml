@@ -1,0 +1,38 @@
+# Example configuration file for Laguna experiments
+# Copy this to your_experiment.yaml and modify for your specific setup
+
+robot:
+  port: "/dev/ttyUSB0"          # Serial port for robot controller
+  baudrate: 9600
+  protocol: "modbus"            # or "ascii"
+  timeout: 5.0
+
+camera:
+  device_id: 0                  # Camera device number
+  fps: 30                       # Frames per second
+  resolution: [1920, 1080]      # Width, Height
+  capture_format: "BGR"         # BGR, RGB, or GRAY
+
+hydraulics:
+  port: "/dev/ttyUSB1"          # Serial port for hydraulics
+  baudrate: 9600
+  poll_interval: 0.1            # Seconds between status polls
+
+data:
+  output_directory: "./data/"
+  compression: "gzip"           # or "none"
+
+storage:
+  enabled: false
+  type: "local"                 # local, s3, or sftp
+  # For S3:
+  # bucket: "my-bucket"
+  # region: "us-east-1"
+  # credentials: "~/.aws/credentials"
+  
+  # For SFTP:
+  # host: "remote.server.edu"
+  # port: 22
+  # username: "labuser"
+  # key_file: "~/.ssh/id_rsa"
+  # remote_path: "/data/experiments"
