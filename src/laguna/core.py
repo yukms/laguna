@@ -10,7 +10,7 @@ from pathlib import Path
 
 from .config import Config
 from .robot import RobotController
-from .camera import CameraAcquisition
+from .camera import CameraAcquisition, DSLRCameraManager
 from .hydraulics import HydraulicsSystem
 from .data import DataProcessor
 from .storage import RemoteStorage
@@ -55,7 +55,18 @@ class FlumeLab:
         self.hydraulics = HydraulicsSystem(self.config.get("hydraulics"))
         self.data_processor = DataProcessor(self.config.get("data"))
         self.storage = RemoteStorage(self.config.get("storage"))
-        
+
+        cameras_config = self.config.config_dict.get("cameras", {})
+        if cameras_config:
+            self.dslr_cameras = DSLRCameraManager.from_config(
+                {
+                    "cameras": cameras_config,
+                    "timelapse": self.config.config_dict.get("timelapse", {}),
+                }
+            )
+        else:
+            self.dslr_cameras = None
+
         self.is_running = False
         logger.info("FlumeLab system initialized successfully")
     
@@ -88,7 +99,16 @@ class FlumeLab:
         if not self.storage.connect():
             logger.warning("Failed to connect remote storage")
             all_connected = False
-        
+
+        # Connect DSLR cameras when configured
+        if self.dslr_cameras is not None:
+            dslr_results = self.dslr_cameras.connect_all()
+            if not any(dslr_results.values()):
+                logger.warning("Failed to connect any DSLR cameras")
+                all_connected = False
+            else:
+                self.dslr_cameras.apply_settings_all()
+
         if all_connected:
             logger.info("All subsystems connected successfully")
         
@@ -100,6 +120,8 @@ class FlumeLab:
         
         self.robot.disconnect()
         self.camera.stop()
+        if self.dslr_cameras is not None:
+            self.dslr_cameras.disconnect_all()
         self.hydraulics.disconnect()
         self.storage.disconnect()
         
@@ -212,6 +234,9 @@ class FlumeLab:
                 "recording": self.camera.is_recording,
                 "frames_captured": self.camera.get_frame_count(),
             },
+            "dslr_cameras": (
+                self.dslr_cameras.get_status() if self.dslr_cameras is not None else None
+            ),
             "hydraulics": {
                 "active": self.hydraulics.is_active,
                 "status": self.hydraulics.get_status(),
@@ -232,5 +257,7 @@ class FlumeLab:
         self.robot.stop()
         self.hydraulics.stop()
         self.camera.stop()
-        
+        if self.dslr_cameras is not None:
+            self.dslr_cameras.disconnect_all()
+
         self.disconnect_all()

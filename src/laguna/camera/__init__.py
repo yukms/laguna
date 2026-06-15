@@ -1,7 +1,9 @@
 """Camera acquisition subsystem for real-time video capture and frame processing."""
 
-from typing import Optional, Tuple, Dict, Any
+from typing import Optional, Dict, Any
 import logging
+
+from .dslr import DSLRCamera, DSLRCameraManager
 
 logger = logging.getLogger(__name__)
 
@@ -136,3 +138,6 @@ class CameraAcquisition:
         """
         # TODO: Implement format conversion (BGR, RGB, GRAY)
         return frame
+
+
+__all__ = ["CameraAcquisition", "DSLRCamera", "DSLRCameraManager"]

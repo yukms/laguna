@@ -18,6 +18,8 @@ class TestConfig:
         assert "hydraulics" in config.config_dict
         assert "data" in config.config_dict
         assert "storage" in config.config_dict
+        assert "cameras" in config.config_dict
+        assert "timelapse" in config.config_dict
     
     def test_get_subsystem(self):
         """Test retrieving subsystem configuration."""

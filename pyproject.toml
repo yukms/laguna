@@ -29,6 +29,7 @@ dependencies = [
     "numpy>=1.21",            # For numerical operations
     "opencv-python>=4.5",     # For camera operations
     "pyyaml>=6.0",            # For YAML configuration files
+    "gphoto2>=2.5.0",         # For Canon DSLR USB control
 ]
 
 [project.optional-dependencies]

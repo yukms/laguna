@@ -61,6 +61,11 @@ class Config:
                 "enabled": False,
                 "type": "local",  # local, s3, sftp
             },
+            "cameras": {},
+            "timelapse": {
+                "interval_seconds": 10,
+                "total_photos": 3,
+            },
         }
     
     def load_from_file(self, config_file: str) -> None:
